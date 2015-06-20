@@ -8,10 +8,19 @@ BIN=CaroloCup-CameraPlayback
 SRCS=CaroloCup-CameraPlayback.cpp
 OBJS=$(subst .cpp,.o,$(SRCS))
 
+# Make variables to create the Docker image.
+PRODUCT=carolocup-cameraplayback
+VERSION=v1
+REPOSITORY=seresearch
+BUILDLOG=build.log
+
 all: $(BIN)
 
 $(BIN): $(OBJS)
 	$(CXX) -o $(BIN) $(OBJS) $(LDLIBS) 
+
+docker: $(BIN)
+	docker build -t $(REPOSITORY)/$(PRODUCT):$(VERSION) . | tee $(BUILDLOG) || exit 1
 
 depend: .depend
 
@@ -23,7 +32,9 @@ clean:
 	$(RM) $(OBJS)
 
 dist-clean: clean
+	$(RM) $(BUILDLOG)
 	$(RM) $(BIN)
 	$(RM) *~ .depend
 
 include .depend
+

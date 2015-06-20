@@ -2,3 +2,4 @@ CaroloCup-CameraPlayback
 *.o
 *~
 .depend
+data
