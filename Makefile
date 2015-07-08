@@ -10,7 +10,7 @@ OBJS=$(subst .cpp,.o,$(SRCS))
 
 # Make variables to create the Docker image.
 PRODUCT=carolocup-cameraplayback
-VERSION=v1
+VERSION=v2
 REPOSITORY=seresearch
 BUILDLOG=build.log
 

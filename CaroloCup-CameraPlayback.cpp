@@ -26,6 +26,7 @@
 #include <opencv/highgui.h>
 
 #include <core/SharedPointer.h>
+#include <core/base/Lock.h>
 #include <core/data/Container.h>
 #include <core/data/image/SharedImage.h>
 #include <core/io/URL.h>
@@ -37,6 +38,7 @@ using namespace std;
 
 // We add some of OpenDaVINCI's namespaces for the sake of readability.
 using namespace core;
+using namespace core::base;
 using namespace core::data;
 using namespace core::data::image;
 using namespace core::io;
@@ -111,25 +113,25 @@ int32_t main(int32_t argc, char **argv) {
 
                 // Check if we could successfully attach to the shared memory.
                 if (sharedImageMemory->isValid()) {
-                    // Lock the memory region to get exclusive access.
-                    sharedImageMemory->lock();
-                    {
-                        if (image == NULL) {
-                            // Create the IplImage header data and access the shared memory for the actual image data. 
-                            image = cvCreateImageHeader(cvSize(si.getWidth(), si.getHeight()), IPL_DEPTH_8U, si.getBytesPerPixel());
+                    // Using a shared lock to get exclusive access.
+                    Lock l(sharedImageMemory);
 
-                            // Let the IplImage point to the shared memory containing the captured image.
-                            image->imageData = static_cast<char*>(sharedImageMemory->getSharedMemory());
-                        }
+                    if (image == NULL) {
+                        // Create the IplImage header data and access the shared memory for the actual image data. 
+                        image = cvCreateImageHeader(cvSize(si.getWidth(), si.getHeight()), IPL_DEPTH_8U, si.getBytesPerPixel());
 
-                        // Show the image using OpenCV.
-                        cvShowImage("CaroloCup-CameraPlayback", image);
-
-                        // Let the image render before proceeding to the next image.
-                        cvWaitKey(10);
+                        // Let the IplImage point to the shared memory containing the captured image.
+                        image->imageData = static_cast<char*>(sharedImageMemory->getSharedMemory());
                     }
-                    // Release the memory region so that the player can provide the next raw image data.
-                    sharedImageMemory->unlock();
+
+                    // Show the image using OpenCV.
+                    cvShowImage("CaroloCup-CameraPlayback", image);
+
+                    // Let the image render before proceeding to the next image.
+                    char c = cvWaitKey(10);
+
+                    // Check if the user wants to stop the replay by pressing ESC.
+                    if (static_cast<uint8_t>(c) == 27) break; 
                 }
             }
         }
