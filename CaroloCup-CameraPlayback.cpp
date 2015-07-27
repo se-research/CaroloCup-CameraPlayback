@@ -33,7 +33,7 @@
 #include <core/wrapper/SharedMemoryFactory.h>
 #include <tools/player/Player.h>
 
-#include <GeneratedHeaders_CoreData.h>
+#include <core/data/image/SharedImage.h>
 
 using namespace std;
 
@@ -41,7 +41,7 @@ using namespace std;
 using namespace core;
 using namespace core::base;
 using namespace core::data;
-using namespace coredata::image;
+using namespace core::data::image;
 using namespace core::io;
 using namespace core::wrapper;
 using namespace tools::player;
@@ -115,7 +115,7 @@ int32_t main(int32_t argc, char **argv) {
                 // Check if we could successfully attach to the shared memory.
                 if (sharedImageMemory->isValid()) {
                     // Using a shared lock to get exclusive access.
-                    Lock l(sharedImageMemory);
+                    sharedImageMemory->lock();
 
                     if (image == NULL) {
                         // Create the IplImage header data and access the shared memory for the actual image data. 
@@ -124,6 +124,8 @@ int32_t main(int32_t argc, char **argv) {
                         // Let the IplImage point to the shared memory containing the captured image.
                         image->imageData = static_cast<char*>(sharedImageMemory->getSharedMemory());
                     }
+
+                    sharedImageMemory->unlock();
 
                     // Show the image using OpenCV.
                     cvShowImage("CaroloCup-CameraPlayback", image);
