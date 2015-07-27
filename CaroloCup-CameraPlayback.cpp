@@ -46,15 +46,76 @@ using namespace core::io;
 using namespace core::wrapper;
 using namespace tools::player;
 
-int32_t main(int32_t argc, char **argv) {
+class CSVRow
+{
+    public:
+        string const& operator[](size_t index) const
+        {
+            return m_data[index];
+        }
+        size_t size() const
+        {
+            return m_data.size();
+        }
+        void readNextRow(istream& str)
+        {
+            string         line;
+            getline(str,line);
+
+            stringstream   lineStream(line);
+            string         cell;
+
+            m_data.clear();
+            while(getline(lineStream,cell,','))
+            {
+                m_data.push_back(cell);
+            }
+        }
+    private:
+        vector<string>    m_data;
+};
+
+void setLabel(cv::Mat& img, const string label, const cv::Point& anchor)
+{
+    int fontface = cv::FONT_HERSHEY_COMPLEX;
+    double scale = 0.4;
+    int thickness = 1;
+    int baseline = 0;
+
+    cv::Size text = cv::getTextSize(label, fontface, scale, thickness, &baseline);
+    cv::rectangle(img, anchor + cv::Point(0, baseline), anchor + cv::Point(text.width, -text.height), CV_RGB(0,0,0), CV_FILLED);
+    cv::putText(img, label, anchor, fontface, scale, CV_RGB(255, 255, 255), thickness, CV_AA);
+}
+
+void errorMessage(string name)
+{
+    cerr << "Wrong command line parameters supplied." << endl
+         << "Usage :\t" << name << " [-l] myRecording.rec [myRecording.csv]" << endl
+         << "Options :" << endl << " -l \t\t\t Enables logging on standard output" << endl;
+}
+
+int32_t main(int32_t argc, char **argv)
+{
     uint32_t retVal = 0;
-    if (argc != 2) {
-        cerr << "Insufficient command line parameters supplied. Use " << string(argv[0]) << " myRecording.rec" << endl;
+    int recIndex=1;
+    bool log=false;
+    
+    if((argc != 2 && argc != 3 && argc != 4) || (argc==4 && string(argv[1]).compare("-l")!=0))
+    {
+        errorMessage(string(argv[0]));
         retVal = 1;
     }
-    else {
+    else
+    {
+        // if -l option is set
+        if(argc==4 || (argc==3 && string(argv[1]).compare("-l")==0))
+        {
+            ++recIndex;
+            log=true;
+        }
+        
         // Use command line parameter as file for playback;
-        string recordingFile(argv[1]);
+        string recordingFile(argv[recIndex]);
         stringstream recordingFileUrl;
         recordingFileUrl << "file://" << recordingFile;
 
@@ -93,6 +154,17 @@ int32_t main(int32_t argc, char **argv) {
         // also having convenient automated system resource management.
         SharedPointer<SharedMemory> sharedImageMemory;
 
+        ifstream file(argv[recIndex+1]);
+        CSVRow row;
+        // read out the header row
+        row.readNextRow(file);
+        uint32_t frameNumber=1, csvFN;
+        int32_t VPx,VPy;
+        stringstream frameMessage;
+        stringstream VPMessage;
+        frameMessage.str(string());
+        VPMessage.str(string());
+        
         // Main data processing loop.
         while (player.hasMoreData()) {
             // Read next entry from recording.
@@ -126,15 +198,45 @@ int32_t main(int32_t argc, char **argv) {
                     }
 
                     sharedImageMemory->unlock();
-
+                    
                     // Show the image using OpenCV.
-                    cvShowImage("CaroloCup-CameraPlayback", image);
+                    
+                    // if csv parameter is set
+                    if(argc==4 || (argc==3 && string(argv[1]).compare("-l")!=0))
+                    {
+                        row.readNextRow(file);
+                        sscanf(row[0].c_str(), "%d", &csvFN);
+                        if(frameNumber==csvFN)
+                        {
+                            cv::Mat img = cv::cvarrToMat(image);
+                            
+                        
+                            frameMessage.str(string());
+                            VPMessage.str(string());
+                            sscanf(row[9].c_str(), "%d", &VPx);
+                            sscanf(row[10].c_str(), "%d", &VPy);
+                            
+                            frameMessage<<"Frame "<<frameNumber;
+                            VPMessage<<"Vanishing Point ("<<VPx<<","<<VPy<<")";
+                            
+                            setLabel(img, frameMessage.str(), cvPoint(30,45));
+                            setLabel(img, VPMessage.str(), cvPoint(30,60));
+                            
+                            if(log)
+                                cout << frameMessage.str() << " :: " << VPMessage.str() <<endl;
+                            
+                            imshow("CaroloCup-CameraPlayback", img);
+                        }
+                    }
+                    else
+                        cvShowImage("CaroloCup-CameraPlayback", image);
 
                     // Let the image render before proceeding to the next image.
                     char c = cvWaitKey(10);
-
                     // Check if the user wants to stop the replay by pressing ESC.
-                    if (static_cast<uint8_t>(c) == 27) break; 
+                    if (static_cast<uint8_t>(c) == 27) break;
+                    
+                    ++frameNumber;
                 }
             }
         }
