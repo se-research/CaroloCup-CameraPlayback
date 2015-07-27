@@ -28,11 +28,12 @@
 #include <core/SharedPointer.h>
 #include <core/base/Lock.h>
 #include <core/data/Container.h>
-#include <core/data/image/SharedImage.h>
 #include <core/io/URL.h>
 #include <core/wrapper/SharedMemory.h>
 #include <core/wrapper/SharedMemoryFactory.h>
 #include <tools/player/Player.h>
+
+#include <GeneratedHeaders_CoreData.h>
 
 using namespace std;
 
@@ -40,7 +41,7 @@ using namespace std;
 using namespace core;
 using namespace core::base;
 using namespace core::data;
-using namespace core::data::image;
+using namespace coredata::image;
 using namespace core::io;
 using namespace core::wrapper;
 using namespace tools::player;
