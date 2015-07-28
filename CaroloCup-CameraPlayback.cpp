@@ -45,16 +45,79 @@ using namespace coredata::image;
 using namespace core::io;
 using namespace core::wrapper;
 using namespace tools::player;
+using namespace cv;
 
-int32_t main(int32_t argc, char **argv) {
+class CSVRow
+{
+    public:
+        string const& operator[](uint32_t index) const
+        {
+            return m_data[index];
+        }
+        uint32_t size() const
+        {
+            return m_data.size();
+        }
+        bool readNextRow(istream& in)
+        {
+            string line;
+            if(!getline(in,line)) return false;
+            
+            stringstream lineStream(line);
+            string cell;
+
+            m_data.clear();
+            while(getline(lineStream,cell,','))
+            {
+                m_data.push_back(cell);
+            }
+            return true;
+        }
+    private:
+        vector<string>    m_data;
+};
+
+void setLabel(Mat& img, const string label, const Point& anchor)
+{
+    int fontface = FONT_HERSHEY_COMPLEX;
+    double scale = 0.4;
+    int thickness = 1;
+    int baseline = 0;
+
+    Size text = getTextSize(label, fontface, scale, thickness, &baseline);
+    rectangle(img, anchor + Point(0, baseline), anchor + Point(text.width, -text.height), CV_RGB(0,0,0), CV_FILLED);
+    putText(img, label, anchor, fontface, scale, CV_RGB(255, 255, 255), thickness, CV_AA);
+}
+
+void errorMessage(string name)
+{
+    cerr << "Wrong command line parameters supplied." << endl
+         << "Usage :\t" << name << " [-l] myRecording.rec [myRecording.csv]" << endl
+         << "Options :" << endl << " -l \t\t\t Enables logging on standard output" << endl;
+}
+
+int32_t main(int32_t argc, char **argv)
+{
     uint32_t retVal = 0;
-    if (argc != 2) {
-        cerr << "Insufficient command line parameters supplied. Use " << string(argv[0]) << " myRecording.rec" << endl;
+    int recIndex=1;
+    bool log=false;
+    
+    if((argc != 2 && argc != 3 && argc != 4) || (argc==4 && string(argv[1]).compare("-l")!=0))
+    {
+        errorMessage(string(argv[0]));
         retVal = 1;
     }
-    else {
+    else
+    {
+        // if -l option is set
+        if(argc==4 || (argc==3 && string(argv[1]).compare("-l")==0))
+        {
+            ++recIndex;
+            log=true;
+        }
+        
         // Use command line parameter as file for playback;
-        string recordingFile(argv[1]);
+        string recordingFile(argv[recIndex]);
         stringstream recordingFileUrl;
         recordingFileUrl << "file://" << recordingFile;
 
@@ -93,6 +156,17 @@ int32_t main(int32_t argc, char **argv) {
         // also having convenient automated system resource management.
         SharedPointer<SharedMemory> sharedImageMemory;
 
+        ifstream file(argv[recIndex+1]);
+        CSVRow row;
+        // read out the header row
+        row.readNextRow(file);
+        uint32_t frameNumber=1, csvFN;
+        int32_t VPx,VPy,BLx,BLy,BRx,BRy,TLx,TLy,TRx,TRy;
+        stringstream frameMessage;
+        stringstream VPMessage;
+        frameMessage.str(string());
+        VPMessage.str(string());
+        
         // Main data processing loop.
         while (player.hasMoreData()) {
             // Read next entry from recording.
@@ -127,16 +201,79 @@ int32_t main(int32_t argc, char **argv) {
                     }
 
                     // Show the image using OpenCV.
-                    cvShowImage("CaroloCup-CameraPlayback", image);
+                    
+                    // if csv parameter is set
+                    if(argc==4 || (argc==3 && string(argv[1]).compare("-l")!=0))
+                    {
+                        if(! row.readNextRow(file)) break;
+                        while(row[0].compare("")==0)
+                            if(! row.readNextRow(file)) break;
+                        
+                        sscanf(row[0].c_str(), "%d", &csvFN);
+                        
+                        if(frameNumber==csvFN)
+                        {
+                            Mat img = cvarrToMat(image);
+                            
+                        
+                            frameMessage.str(string());
+                            VPMessage.str(string());
+                            sscanf(row[9].c_str(), "%d", &VPx);
+                            sscanf(row[10].c_str(), "%d", &VPy);
+                            
+                            frameMessage<<"Frame "<<frameNumber;
+                            VPMessage<<"Vanishing Point ("<<VPx<<","<<VPy<<")";
+                            
+                            setLabel(img, frameMessage.str(), cvPoint(30,45));
+                            setLabel(img, VPMessage.str(), cvPoint(30,60));
+                            
+                            if(log)
+                                cout << frameMessage.str() << " :: " << VPMessage.str() <<endl;
+                            
+                            // print support points and lines
+                            sscanf(row[1].c_str(), "%d", &BLx);
+                            sscanf(row[2].c_str(), "%d", &BLy);
+                            sscanf(row[3].c_str(), "%d", &TLx);
+                            sscanf(row[4].c_str(), "%d", &TLy);
+                            sscanf(row[5].c_str(), "%d", &TRx);
+                            sscanf(row[6].c_str(), "%d", &TRy);
+                            sscanf(row[7].c_str(), "%d", &BRx);
+                            sscanf(row[8].c_str(), "%d", &BRy);
+                            
+                            circle(img, Point(BLx,BLy), 5, CV_RGB(255, 255, 255), CV_FILLED);
+                            circle(img, Point(TLx,TLy), 5, CV_RGB(255, 255, 255), CV_FILLED);
+                            circle(img, Point(TRx,TRy), 5, CV_RGB(255, 255, 255), CV_FILLED);
+                            circle(img, Point(BRx,BRy), 5, CV_RGB(255, 255, 255), CV_FILLED);
+                            
+                            double slope1 = static_cast<double>(TLy-BLy)/static_cast<double>(TLx-BLx);
+                            double slope2 = static_cast<double>(TRy-BRy)/static_cast<double>(TRx-BRx);
+                            Point p1(0,0), q1(img.cols,img.rows);
+                            Point p2(0,0), q2(img.cols,img.rows);
+                            p1.y = -(BLx-p1.x) * slope1 + BLy;
+                            q1.y = -(TLx-q1.x) * slope1 + TLy;
+                            p2.y = -(BRx-p2.x) * slope2 + BRy;
+                            q2.y = -(TRx-q2.x) * slope2 + TRy;
+                            
+                            line(img,p1,q1,CV_RGB(255, 255, 255),1,CV_AA);
+                            line(img,p2,q2,CV_RGB(255, 255, 255),1,CV_AA);
+                            
+                            imshow("CaroloCup-CameraPlayback", img);
+                        }
+                    }
+                    else
+                        cvShowImage("CaroloCup-CameraPlayback", image);
 
                     // Let the image render before proceeding to the next image.
                     char c = cvWaitKey(10);
-
                     // Check if the user wants to stop the replay by pressing ESC.
-                    if (static_cast<uint8_t>(c) == 27) break; 
+                    if (static_cast<uint8_t>(c) == 27) break;
+                    
+                    ++frameNumber;
                 }
             }
         }
+
+        // maybe print EOF message && wait for user input?
 
         // Release IplImage data structure.
         cvReleaseImage(&image);
