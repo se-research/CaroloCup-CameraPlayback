@@ -1,8 +1,8 @@
 CXX=g++
 RM=rm -f
-INCLUDES=-I/usr/include/opendavinci
+INCLUDES=-I/opt/od/include/opendavinci
 CPPFLAGS=-Wall $(INCLUDES)
-LDLIBS=-lopendavinci -lpthread -lopencv_core -lopencv_highgui
+LDLIBS=-L/opt/od/lib/ -lopendavinci -lpthread -lopencv_core -lopencv_highgui
 
 BIN=CaroloCup-CameraPlayback
 SRCS=CaroloCup-CameraPlayback.cpp
