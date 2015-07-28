@@ -267,6 +267,10 @@ int32_t main(int32_t argc, char **argv)
                     char c = cvWaitKey(10);
                     // Check if the user wants to stop the replay by pressing ESC.
                     if (static_cast<uint8_t>(c) == 27) break;
+                    else if (static_cast<uint8_t>(c) == 32) {
+                        char c = cvWaitKey();
+                        if (static_cast<uint8_t>(c) == 27) break;
+                    }
                     
                     ++frameNumber;
                 }
