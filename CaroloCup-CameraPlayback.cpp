@@ -166,6 +166,7 @@ int32_t main(int32_t argc, char **argv)
         stringstream VPMessage;
         frameMessage.str(string());
         VPMessage.str(string());
+        bool fbf=false;
         
         // Main data processing loop.
         while (player.hasMoreData()) {
@@ -265,11 +266,17 @@ int32_t main(int32_t argc, char **argv)
 
                     // Let the image render before proceeding to the next image.
                     char c = cvWaitKey(10);
-                    // Check if the user wants to stop the replay by pressing ESC.
+                    // Check if the user wants to stop the replay by pressing ESC or pause it by pressing SPACE (needed also to go frame-by-frame).
                     if (static_cast<uint8_t>(c) == 27) break;
-                    else if (static_cast<uint8_t>(c) == 32) {
-                        char c = cvWaitKey();
-                        if (static_cast<uint8_t>(c) == 27) break;
+                    else if (static_cast<uint8_t>(c) == 32 || fbf) {
+                        do
+                        {
+                            c = cvWaitKey();
+                        }while(c!='n' && static_cast<uint8_t>(c) != 32 && static_cast<uint8_t>(c) != 27);
+                        
+                        if (static_cast<uint8_t>(c) == 27) break; // ESC
+                        else if (static_cast<uint8_t>(c) == 32) fbf=false; // SPACE -> continue
+                        else if (c=='n') fbf=true; // pressed 'n' -> next frame
                     }
                     
                     ++frameNumber;
