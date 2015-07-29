@@ -247,13 +247,13 @@ int32_t main(int32_t argc, char **argv)
                             
                             // print support points and lines
                             sscanf(row[1].c_str(), "%d", &BLx);
-                            sscanf(row[2].c_str(), "%d", &BLy);
+                            sscanf(row[2].c_str(), "%d", &BLy);BLy+=60;
                             sscanf(row[3].c_str(), "%d", &TLx);
-                            sscanf(row[4].c_str(), "%d", &TLy);
+                            sscanf(row[4].c_str(), "%d", &TLy);TLy+=60;
                             sscanf(row[5].c_str(), "%d", &TRx);
-                            sscanf(row[6].c_str(), "%d", &TRy);
+                            sscanf(row[6].c_str(), "%d", &TRy);TRy+=60;
                             sscanf(row[7].c_str(), "%d", &BRx);
-                            sscanf(row[8].c_str(), "%d", &BRy);
+                            sscanf(row[8].c_str(), "%d", &BRy);BRy+=60;
                             
                             circle(img, Point(BLx,BLy), 5, CV_RGB(255, 255, 255), CV_FILLED);
                             circle(img, Point(TLx,TLy), 5, CV_RGB(255, 255, 255), CV_FILLED);
