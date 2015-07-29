@@ -91,9 +91,18 @@ void setLabel(Mat& img, const string label, const Point& anchor)
 
 void errorMessage(string name)
 {
-    cerr << "Wrong command line parameters supplied." << endl
-         << "Usage :\t" << name << " [-l] myRecording.rec [myRecording.csv]" << endl
-         << "Options :" << endl << " -l \t\t\t Enables logging on standard output" << endl;
+    cerr << "Wrong command line parameters supplied." << endl;
+    cerr << "Usage :\t" << name << " -h" << endl
+                << "\t" << name << " [-l] myRecording.rec [myRecording.csv]" << endl
+         << "Options :" << endl << " -l \t\t\t Enables logging to standard output" << endl;
+}
+
+void helpMessage(string name)
+{
+    cerr << "Usage :\t" << name << " -h" << endl
+                << "\t" << name << " [-l] myRecording.rec [myRecording.csv]" << endl
+         << "Options :" << endl << " -h \t\t\t Show this help" << endl
+                                << " -l \t\t\t Enables logging to standard output" << endl;
 }
 
 int32_t main(int32_t argc, char **argv)
@@ -106,6 +115,11 @@ int32_t main(int32_t argc, char **argv)
     {
         errorMessage(string(argv[0]));
         retVal = 1;
+    }
+    else if(argc==2 && string(argv[1]).compare("-h")==0)
+    {
+        helpMessage(string(argv[0]));
+        retVal = 0;
     }
     else
     {
