@@ -32,5 +32,5 @@ you have a folder named ``data`` where the *.rec files
 are located to be mapped into the Docker container on
 its execution::
 
-    $ docker run -ti -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v ${PWD}/data:/opt/data seresearch/carolocup-cameraplayback:v1 /CaroloCup-CameraPlayback /opt/data/myRecording.rec
+    $ docker run -ti -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v ${PWD}/data:/opt/data seresearch/carolocup-cameraplayback:latest /CaroloCup-CameraPlayback /opt/data/myRecording.rec
 
