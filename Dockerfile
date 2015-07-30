@@ -19,7 +19,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 # Author: Christian Berger
-# Date: 2015-06-25
+# Date: 2015-07-30
 
 FROM seresearch/opendavinci-ubuntu-amd64:latest
 MAINTAINER Christian Berger "christian.berger@gu.se"
@@ -38,5 +38,5 @@ RUN apt-get autoremove
 # Set locale (fix the locale warnings)
 RUN localedef -v -c -i en_US -f UTF-8 en_US.UTF-8 || :
 
-ADD CaroloCup-CameraPlayback /CaroloCup-CameraPlayback
+ADD build/CaroloCup-CameraPlayback /CaroloCup-CameraPlayback
 
