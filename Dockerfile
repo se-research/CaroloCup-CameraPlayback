@@ -35,6 +35,18 @@ RUN apt-get -y install libopencv-dev
 RUN apt-get clean
 RUN apt-get autoremove
 
+RUN apt-get update -y
+RUN apt-get upgrade -y
+
+RUN apt-get install -y wget
+
+RUN wget -O - -q http://opendavinci.cse.chalmers.se/opendavinci.cse.chalmers.se.gpg.key | apt-key add -
+RUN echo "deb http://opendavinci.cse.chalmers.se/ubuntu/ trusty main" >> /etc/apt/sources.list
+
+RUN apt-get update -y
+
+RUN apt-get install -y opendavinci-odlib
+
 # Set locale (fix the locale warnings)
 RUN localedef -v -c -i en_US -f UTF-8 en_US.UTF-8 || :
 
