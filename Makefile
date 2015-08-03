@@ -1,41 +1,31 @@
-PREFIX=/usr
-CXX=g++
-RM=rm -f
-INCLUDES=-I$(PREFIX)/include/opendavinci
-CPPFLAGS=-Wall $(INCLUDES)
-LDLIBS=-L$(PREFIX)/lib/ -lopendavinci -lpthread -lopencv_core -lopencv_highgui
+# Makefile - Makefile to create a Docker image.
+# Copyright (C) 2015  Christian Berger
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-BIN=CaroloCup-CameraPlayback
-SRCS=CaroloCup-CameraPlayback.cpp
-OBJS=$(subst .cpp,.o,$(SRCS))
-
-# Make variables to create the Docker image.
 PRODUCT=carolocup-cameraplayback
-VERSION=v2
+VERSION=v2.0.4
 REPOSITORY=seresearch
 BUILDLOG=build.log
 
-all: $(BIN)
-
-$(BIN): $(OBJS)
-	$(CXX) -o $(BIN) $(OBJS) $(LDLIBS) 
-
-docker: $(BIN)
+docker:
 	docker build -t $(REPOSITORY)/$(PRODUCT):$(VERSION) . | tee $(BUILDLOG) || exit 1
 
-depend: .depend
+docker-tag-latest:
+	docker tag -f $(shell tail -1 $(BUILDLOG) | cut -f3 -d" ") $(REPOSITORY)/$(PRODUCT):latest
 
-.depend: $(SRCS)
-	rm -f ./.depend
-	$(CXX) $(CPPFLAGS) -MM $^>>./.depend;
-
-clean:
-	$(RM) $(OBJS)
-
-dist-clean: clean
-	$(RM) $(BUILDLOG)
-	$(RM) $(BIN)
-	$(RM) *~ .depend
-
-include .depend
+push:
+	docker push $(REPOSITORY)/$(PRODUCT):$(VERSION) && docker push $(REPOSITORY)/$(PRODUCT):latest
 
