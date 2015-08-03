@@ -243,7 +243,7 @@ int32_t main(int32_t argc, char **argv)
                             setLabel(img, VPMessage.str(), cvPoint(30,60));
                             
                             if(log)
-                                cout << frameMessage.str() << " :: " << VPMessage.str() <<endl;
+                                cout << frameNumber << ", " << VPx << ", " << VPy <<endl;
                             
                             // print support points and lines
                             sscanf(row[1].c_str(), "%d", &BLx);
