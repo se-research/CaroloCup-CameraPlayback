@@ -16,7 +16,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 PRODUCT=carolocup-cameraplayback
-VERSION=v2.0.4
+VERSION=v2.0.7
 REPOSITORY=seresearch
 BUILDLOG=build.log
 
