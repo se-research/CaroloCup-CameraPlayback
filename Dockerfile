@@ -19,7 +19,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 # Author: Christian Berger
-# Date: 2015-07-30
+# Date: 2015-08-13
 
 FROM seresearch/opendavinci-ubuntu-amd64:latest
 MAINTAINER Christian Berger "christian.berger@gu.se"

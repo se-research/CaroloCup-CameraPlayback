@@ -14,8 +14,30 @@ To compile the source file, you need to install the
 OpenDaVINCI libraries (cf. http://opendavinci.readthedocs.org)
 and OpenCV.
 
+To compile the sources on Ubuntu Linux, you would need to
+install the following libraries from the main repository::
+
+    $ sudo apt-get install build-essential libopencv-dev cmake
+
+Next, you need to add the repository that provides OpenDaVINCI::
+
+    $ wget -O - -q http://opendavinci.cse.chalmers.se/opendavinci.cse.chalmers.se.gpg.key | apt-key add -
+
+    $ echo "deb http://opendavinci.cse.chalmers.se/ubuntu/ trusty main" >> /etc/apt/sources.list
+
+Finally, you need to install the OpenDaVINCI library::
+
+    $ sudo apt-get install opendavinci-odlib 
+
+Now, you can compile the sources as follows::
+
+    $ mkdir build && cd build
+
+    $ cmake .. && make
+
 Once you will have compiled the source file successfully,
-you can run it as follows::
+you can run it as follows where myRecording.rec is one
+of the recordings that we provide::
 
     $ ./CaroloCup-CameraPlayback myRecording.rec
 
