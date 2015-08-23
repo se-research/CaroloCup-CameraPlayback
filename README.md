@@ -10,6 +10,8 @@ To playback a recording file that contains data captured
 on our experimental car like the video stream and more data,
 simply clone this repository and run make all.
 
+![Screenshot](https://github.com/se-research/CaroloCup-CameraPlayback/blob/master/screenshot.png)
+
 To compile the source file, you need to install the
 OpenDaVINCI libraries (cf. http://opendavinci.readthedocs.org)
 and OpenCV.
