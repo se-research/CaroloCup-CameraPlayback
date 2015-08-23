@@ -48,7 +48,7 @@ just specify the .csv file as additional parameter:
 
     $ ./CaroloCup-CameraPlayback recordingFile.rec recordingFile.csv
 
-You can find the data set here: https://se-div-c3s-1.ce.chalmers.se:7001/fbsharing/OdxVxJQD
+You can find the data set here: https://se-div-c3s-1.ce.chalmers.se:7001/fbdownload/Ground_Truth?k=iKuAbfQF
 
 Alternatively, you can also use our Docker image where
 we provide a ready-to-use binary image. As our image
