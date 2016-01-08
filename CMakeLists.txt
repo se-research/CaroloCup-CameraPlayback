@@ -28,6 +28,10 @@ SET (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake.Modules" ${CMAKE_MODUL
 
 ###########################################################################
 # Find OpenDaVINCI.
+IF ("${OPENDAVINCI_DIR}" STREQUAL "")
+    SET (OPENDAVINCI_DIR ${CMAKE_INSTALL_PREFIX})
+ENDIF()
+SET (CMAKE_MODULE_PATH "${OPENDAVINCI_DIR}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules" ${CMAKE_MODULE_PATH})
 FIND_PACKAGE (OpenDaVINCI REQUIRED)
 
 ###########################################################################
