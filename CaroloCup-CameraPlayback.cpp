@@ -26,26 +26,26 @@
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
 
-#include <core/SharedPointer.h>
-#include <core/base/Lock.h>
-#include <core/data/Container.h>
-#include <core/io/URL.h>
-#include <core/wrapper/SharedMemory.h>
-#include <core/wrapper/SharedMemoryFactory.h>
-#include <tools/player/Player.h>
+#include <opendavinci/odcore/SharedPointer.h>
+#include <opendavinci/odcore/base/Lock.h>
+#include <opendavinci/odcore/data/Container.h>
+#include <opendavinci/odcore/io/URL.h>
+#include <opendavinci/odcore/wrapper/SharedMemory.h>
+#include <opendavinci/odcore/wrapper/SharedMemoryFactory.h>
+#include <opendavinci/odtools/player/Player.h>
 
-#include <GeneratedHeaders_CoreData.h>
+#include <opendavinci/GeneratedHeaders_OpenDaVINCI.h>
 
 using namespace std;
 
 // We add some of OpenDaVINCI's namespaces for the sake of readability.
-using namespace core;
-using namespace core::base;
-using namespace core::data;
-using namespace coredata::image;
-using namespace core::io;
-using namespace core::wrapper;
-using namespace tools::player;
+using namespace odcore;
+using namespace odcore::base;
+using namespace odcore::data;
+using namespace odcore::data::image;
+using namespace odcore::io;
+using namespace odcore::wrapper;
+using namespace odtools::player;
 using namespace cv;
 
 class CSVRow
@@ -190,7 +190,7 @@ int32_t main(int32_t argc, char **argv)
 
             // Data type SHARED_IMAGE contains a SharedImage data structure that
             // provides meta-information about the captured image.
-            if (nextContainer.getDataType() == Container::SHARED_IMAGE) {
+            if (nextContainer.getDataType() == SharedImage::ID()) {
                 // Read the data structure to retrieve information about the image.
                 SharedImage si = nextContainer.getData<SharedImage>();
 
