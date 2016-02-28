@@ -20,13 +20,13 @@
  */
 
 #include <fstream>
+#include <memory>
 #include <string>
 #include <sstream>
 
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
 
-#include <opendavinci/odcore/SharedPointer.h>
 #include <opendavinci/odcore/base/Lock.h>
 #include <opendavinci/odcore/data/Container.h>
 #include <opendavinci/odcore/io/URL.h>
@@ -169,7 +169,7 @@ int32_t main(int32_t argc, char **argv)
 
         // Using this variable, we will access the captured images while
         // also having convenient automated system resource management.
-        SharedPointer<SharedMemory> sharedImageMemory;
+        shared_ptr<SharedMemory> sharedImageMemory;
 
         ifstream file(argv[recIndex+1]);
         CSVRow row;

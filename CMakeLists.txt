@@ -26,6 +26,8 @@ PROJECT (CaroloCup-CameraPlayback)
 # Set the search path for .cmake files.
 SET (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake.Modules" ${CMAKE_MODULE_PATH})
 
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -std=c++11 -Wall -Wextra")
+
 ###########################################################################
 # Find OpenDaVINCI.
 IF ("${OPENDAVINCI_DIR}" STREQUAL "")
