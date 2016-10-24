@@ -225,7 +225,7 @@ int32_t main(int32_t argc, char **argv)
 
                       std::cerr << "Writing to: " << filename.str() << std::endl;
 
-                      Mat img = cvarrToMat(image);
+                      cv::Mat img = cvarrToMat(image);
 
                       // write with maximum png compression
                       cv::imwrite(filename.str(), img, std::vector<int>{CV_IMWRITE_PNG_COMPRESSION, 9});
