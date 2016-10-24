@@ -22,6 +22,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <iomanip>
 
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
@@ -111,6 +112,7 @@ int32_t main(int32_t argc, char **argv)
     uint32_t retVal = 0;
     int recIndex=1;
     bool log=false;
+    bool writeFrames = true;
     
     if((argc != 2 && argc != 3 && argc != 4) || (argc==4 && string(argv[1]).compare("-l")!=0))
     {
@@ -182,7 +184,7 @@ int32_t main(int32_t argc, char **argv)
         frameMessage.str(string());
         VPMessage.str(string());
         bool fbf=false;
-        
+
         // Main data processing loop.
         while (player.hasMoreData()) {
             // Read next entry from recording.
@@ -216,6 +218,19 @@ int32_t main(int32_t argc, char **argv)
                         }
                     }
 
+                    // write image to file
+                    if(writeFrames) {
+                      std::ostringstream filename;
+                      filename << std::setfill('0') << std::setw(8) << frameNumber << ".png";
+
+                      std::cerr << "Writing to: " << filename.str() << std::endl;
+
+                      cv::Mat img = cvarrToMat(image);
+
+                      // write with maximum png compression
+                      cv::imwrite(filename.str(), img, std::vector<int>{CV_IMWRITE_PNG_COMPRESSION, 9});
+                    }
+
                     // Show the image using OpenCV.
                     
                     // if csv parameter is set
@@ -226,12 +241,12 @@ int32_t main(int32_t argc, char **argv)
                             if(! row.readNextRow(file)) break;
                         
                         sscanf(row[0].c_str(), "%d", &csvFN);
-                        
+
                         if(frameNumber==csvFN)
                         {
                             Mat img = cvarrToMat(image);
-                            
-                        
+
+
                             frameMessage.str(string());
                             VPMessage.str(string());
                             sscanf(row[9].c_str(), "%d", &VPx);
